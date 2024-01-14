@@ -1,5 +1,6 @@
 package com.neidev.picpay.domain.core.transaction.model;
 
+import com.neidev.picpay.domain.core.transaction.json.TransactionResponse;
 import com.neidev.picpay.domain.core.user.model.User;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -27,4 +28,14 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "payee_id")
     private User payee;
+
+    public TransactionResponse toResponse() {
+        return TransactionResponse.builder()
+                .id(getId())
+                .amount(getAmount())
+                .moment(getMoment())
+                .payer(getPayer())
+                .payee(getPayee())
+                .build();
+    }
 }

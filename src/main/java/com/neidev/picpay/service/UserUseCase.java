@@ -5,7 +5,7 @@ import com.neidev.picpay.domain.core.user.json.UserResponse;
 
 import java.util.List;
 
-public interface UserServiceUseCase {
+public interface UserUseCase {
 
     public UserResponse create(UserForm data);
 

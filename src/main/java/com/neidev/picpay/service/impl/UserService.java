@@ -4,17 +4,19 @@ import com.neidev.picpay.domain.core.user.json.UserForm;
 import com.neidev.picpay.domain.core.user.json.UserResponse;
 import com.neidev.picpay.domain.core.user.model.User;
 import com.neidev.picpay.domain.repository.UserRepository;
+import com.neidev.picpay.enums.UserCategory;
+import com.neidev.picpay.handler.exception.InvalidPayerException;
 import com.neidev.picpay.handler.exception.ResourceNotFoundException;
 import com.neidev.picpay.handler.exception.UserCredentialsException;
-import com.neidev.picpay.service.UserServiceUseCase;
-import org.apache.coyote.BadRequestException;
+import com.neidev.picpay.service.UserUseCase;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
-public class UserService implements UserServiceUseCase {
+public class UserService implements UserUseCase {
 
     private final UserRepository userRepository;
 
@@ -66,5 +68,23 @@ public class UserService implements UserServiceUseCase {
     boolean isDocumentValid(String document) {
         var result = userRepository.findByDocument(document);
         return result.isEmpty();
+    }
+
+    public boolean isPayerValid(User payer, BigDecimal amount) {
+        try {
+            if(!(payer.getUserCategory() == UserCategory.COMMON))
+                throw new InvalidPayerException("Payer doesn't have permission to proceed.");
+
+            if(payer.getBalance().compareTo(amount) < 0)
+                throw new InvalidPayerException("Operation cancelled, insufficient funds.");
+
+            return true;
+        } catch (InvalidPayerException e) {
+            throw new InvalidPayerException(e.getMessage());
+        }
+    }
+
+    public void updateBalance(User user) {
+        userRepository.save(user);
     }
 }
