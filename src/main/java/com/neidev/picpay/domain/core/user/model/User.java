@@ -1,12 +1,15 @@
 package com.neidev.picpay.domain.core.user.model;
 
+import com.neidev.picpay.domain.core.user.json.UserResponse;
 import com.neidev.picpay.enums.UserCategory;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
+@Builder
 @Entity(name = "USER")
 @Table(name = "TB_USER")
 public class User {
@@ -28,4 +31,14 @@ public class User {
     private String passowrd;
 
     private UserCategory userCategory;
+
+    public UserResponse toResponse() {
+        return UserResponse.builder()
+                .name(getName())
+                .email(getEmail())
+                .document(getDocument())
+                .balance(getBalance())
+                .userCategory(getUserCategory())
+                .build();
+    }
 }
